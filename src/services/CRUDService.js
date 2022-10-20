@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
-const salt = bcrypt.genSaltSync(10);
 import db from "../models/index";
+const salt = bcrypt.genSaltSync(10);
 
 let createNewUser = async (data) => {
 	return new Promise(async (resolve, reject) => {
@@ -84,7 +84,6 @@ let updateUserData = (data) => {
 			} else {
 				resolve();
 			}
-			await db.User.update({});
 		} catch (error) {
 			console.log(error);
 		}
