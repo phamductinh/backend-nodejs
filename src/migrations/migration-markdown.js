@@ -21,16 +21,16 @@ module.exports = {
 				allowNull: true,
 				type: Sequelize.TEXT("long"),
 			},
-			doctorID: {
-				allowNull: false,
+			doctorId: {
+				allowNull: true,
 				type: Sequelize.INTEGER,
 			},
 			specialtyId: {
-				allowNull: false,
+				allowNull: true,
 				type: Sequelize.INTEGER,
 			},
 			clinicId: {
-				allowNull: false,
+				allowNull: true,
 				type: Sequelize.INTEGER,
 			},
 
