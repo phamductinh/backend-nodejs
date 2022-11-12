@@ -1,5 +1,6 @@
 import db from "../models/index";
 require("dotenv").config();
+import _ from "lodash";
 
 const MAX_NUMBER_SCHEDULE = process.env.MAX_NUMBER_SCHEDULE;
 
@@ -164,7 +165,7 @@ let getDetailDoctorById = (inputId) => {
 let bulkCreateSchedule = (data) => {
 	return new Promise(async (resolve, reject) => {
 		try {
-			if (!data.arrSchedule) {
+			if (!data.arrSchedule || !data.doctorId || !data.formattedDate) {
 				resolve({
 					errCode: 1,
 					arrMessage: "Missing required parameter !",
@@ -177,10 +178,62 @@ let bulkCreateSchedule = (data) => {
 						return item;
 					});
 				}
-				await db.Schedule.bulkCreate(schedule);
+				let existing = await db.Schedule.findAll({
+					where: {
+						doctorId: data.doctorId,
+						date: data.formattedDate,
+					},
+					attributes: ["timeType", "date", "doctorId", "maxNumber"],
+					raw: true,
+				});
+
+				let toCreate = _.differenceWith(schedule, existing, (a, b) => {
+					return a.timeType === b.timeType && +a.date === +b.date;
+				});
+
+				if (toCreate && toCreate.length > 0) {
+					await db.Schedule.bulkCreate(toCreate);
+				}
+
 				resolve({
 					errCode: 0,
 					errMessage: "Ok",
+				});
+			}
+		} catch (error) {
+			reject(error);
+		}
+	});
+};
+
+let getScheduleByDate = (doctorId, date) => {
+	return new Promise(async (resolve, reject) => {
+		try {
+			if (!doctorId || !date) {
+				resolve({
+					errCode: 1,
+					errMessage: "Missing required parameter !",
+				});
+			} else {
+				let dataSchedule = await db.Schedule.findAll({
+					where: {
+						doctorId: doctorId,
+						date: date,
+					},
+					include: [
+						{
+							model: db.Allcode,
+							as: "timeTypeData",
+							attributes: ["valueEn", "valueVi"],
+						},
+					],
+					raw: false,
+					nest: true,
+				});
+				if (!dataSchedule) dataSchedule = [];
+				resolve({
+					errCode: 0,
+					data: dataSchedule,
 				});
 			}
 		} catch (error) {
@@ -195,4 +248,5 @@ module.exports = {
 	saveDetailInforDoctor: saveDetailInforDoctor,
 	getDetailDoctorById: getDetailDoctorById,
 	bulkCreateSchedule: bulkCreateSchedule,
+	getScheduleByDate: getScheduleByDate,
 };
