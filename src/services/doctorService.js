@@ -67,7 +67,13 @@ let saveDetailInforDoctor = (inputData) => {
 				!inputData.doctorId ||
 				!inputData.contentHTML ||
 				!inputData.contentMarkdown ||
-				!inputData.action
+				!inputData.action ||
+				!inputData.selectedPrice ||
+				!inputData.selectedPayment ||
+				!inputData.selectedProvince ||
+				!inputData.nameClinic ||
+				!inputData.addressClinic ||
+				!inputData.note
 			) {
 				resolve({
 					errCode: 1,
@@ -95,6 +101,36 @@ let saveDetailInforDoctor = (inputData) => {
 
 						await doctorMarkdown.save();
 					}
+				}
+
+				let doctorInfor = await db.Doctor_Infor.findOne({
+					where: {
+						doctorId: inputData.doctorId,
+					},
+					raw: false,
+				});
+				if (doctorInfor) {
+					//update
+					doctorInfor.doctorId = inputData.doctorId;
+					doctorInfor.priceId = inputData.selectedPrice;
+					doctorInfor.paymentId = inputData.selectedPayment;
+					doctorInfor.provinceId = inputData.selectedProvince;
+					doctorInfor.addressClinic = inputData.addressClinic;
+					doctorInfor.nameClinic = inputData.nameClinic;
+					doctorInfor.note = inputData.note;
+
+					await doctorInfor.save();
+				} else {
+					//create
+					await db.Doctor_Infor.create({
+						doctorId: inputData.doctorId,
+						priceId: inputData.selectedPrice,
+						paymentId: inputData.selectedPayment,
+						provinceId: inputData.selectedProvince,
+						addressClinic: inputData.addressClinic,
+						nameClinic: inputData.nameClinic,
+						note: inputData.note,
+					});
 				}
 
 				resolve({
@@ -137,6 +173,29 @@ let getDetailDoctorById = (inputId) => {
 							model: db.Allcode,
 							as: "positionData",
 							attributes: ["valueEn", "valueVi"],
+						},
+						{
+							model: db.Doctor_Infor,
+							attributes: {
+								exclude: ["id", "doctorId"],
+							},
+							include: [
+								{
+									model: db.Allcode,
+									as: "priceTypeData",
+									attributes: ["valueEn", "valueVi"],
+								},
+								{
+									model: db.Allcode,
+									as: "paymentTypeData",
+									attributes: ["valueEn", "valueVi"],
+								},
+								{
+									model: db.Allcode,
+									as: "provinceTypeData",
+									attributes: ["valueEn", "valueVi"],
+								},
+							],
 						},
 					],
 					raw: false,
