@@ -285,6 +285,11 @@ let getScheduleByDate = (doctorId, date) => {
 							as: "timeTypeData",
 							attributes: ["valueEn", "valueVi"],
 						},
+						{
+							model: db.User,
+							as: "doctorData",
+							attributes: ["firstName", "lastName"],
+						},
 					],
 					raw: false,
 					nest: true,
@@ -349,7 +354,7 @@ let getExtraInforDoctorById = (idInput) => {
 	});
 };
 let getProfileDoctorById = (inputId) => {
-	return new Promise(async (resolve, reject) => { 
+	return new Promise(async (resolve, reject) => {
 		try {
 			if (!inputId) {
 				resolve({
