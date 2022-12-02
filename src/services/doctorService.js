@@ -133,6 +133,7 @@ let saveDetailInforDoctor = (inputData) => {
 				});
 			}
 		} catch (error) {
+            console.log(error)
 			reject(error);
 		}
 	});
@@ -421,7 +422,7 @@ let getProfileDoctorById = (inputId) => {
 	});
 };
 
-let checkRequiredFields = (data) => {
+let checkRequiredFields = (inputData) => {
 	let arrFields = [
 		"doctorId",
 		"contentHTML",
