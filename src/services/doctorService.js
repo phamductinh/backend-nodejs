@@ -442,14 +442,12 @@ let getListPatientForDoctor = (doctorId, date) => {
 						{
 							model: db.User,
 							as: "patientData",
-							attributes: {
-								exclude: [
-									"email",
-									"firstName",
-									"address",
-									"gender",
-								],
-							},
+							attributes: [
+								"email",
+								"firstName",
+								"address",
+								"gender",
+							],
 							include: [
 								{
 									model: db.Allcode,
@@ -531,9 +529,12 @@ let sendRemedy = (data) => {
 					raw: false,
 				});
 				if (appointment) {
-					(appointment.statusId = "S3"), await appointment.save();
+					appointment.statusId = "S3";
+					await appointment.save();
 				}
+
 				await emailService.sendAttachment(data);
+
 				resolve({
 					errCode: 0,
 					errMessage: "Ok",
