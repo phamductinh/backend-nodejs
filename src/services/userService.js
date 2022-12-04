@@ -22,6 +22,7 @@ let handleUserLogin = (email, password) => {
 			if (isExist) {
 				let user = await db.User.findOne({
 					attributes: [
+						"id",
 						"email",
 						"roleId",
 						"password",
@@ -183,7 +184,7 @@ let updateUserData = (data) => {
 				if (data.avatar) {
 					user.image = data.avatar;
 				}
-                    
+
 				await user.save();
 
 				resolve({
